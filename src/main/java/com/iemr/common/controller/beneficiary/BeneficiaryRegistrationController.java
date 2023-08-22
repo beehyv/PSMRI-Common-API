@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,7 +41,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.GsonBuilder;
 import com.iemr.common.data.beneficiary.BenPhoneMap;
 import com.iemr.common.data.beneficiary.BeneficiaryRegistrationData;
-import com.iemr.common.data.beneficiary.BeneficiaryType;
 import com.iemr.common.data.directory.Directory;
 import com.iemr.common.model.beneficiary.BeneficiaryModel;
 import com.iemr.common.service.beneficiary.BenRelationshipTypeService;
@@ -68,11 +66,6 @@ import com.iemr.common.utils.response.OutputResponse;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-
-/**
- * Controller class to get the user and beneficiary related data
- *
- */
 
 @RequestMapping({ "/beneficiary" })
 @RestController
@@ -182,10 +175,9 @@ public class BeneficiaryRegistrationController {
 	@Autowired
 	private CallReportsService callReportsService;
 
-	@ApiOperation(value = "Creates a new beneficiary")
+	@ApiOperation(value = "Create a new beneficiary")
 	@CrossOrigin()
 	@RequestMapping(value = "/create", method = RequestMethod.POST, produces = "application/json", consumes = "application/json", headers = "Authorization")
-	// @Transactional
 
 	public String createBeneficiary(
 			@ApiParam(value = "{\"providerServiceMapID\":\"Integer\",\"firstName\":\"String\",\"lastName\":\"String\",\"dOB\":\"Timestamp\","
@@ -213,70 +205,8 @@ public class BeneficiaryRegistrationController {
 		return response.toString();
 	}
 
-	/**
-	 * @param beneficiaryType
-	 * @return
-	 */
-	@Deprecated
-	@ApiOperation(value = "Creates a new beneficiary")
 	@CrossOrigin()
-	@RequestMapping(value = "/update/relationship", method = RequestMethod.POST, produces = "application/json", headers = "Authorization")
-	public String addBeneficiaryRelation(@RequestBody String beneficiaryType) {
-		OutputResponse response = new OutputResponse();
-		logger.info("Update relationship request " + beneficiaryType);
-		try {
-			BeneficiaryType iBeneficiaryType = inputMapper.gson().fromJson(beneficiaryType, BeneficiaryType.class);
-			iBeneficiaryType = this.iemrBeneficiaryTypeService.addRelation(iBeneficiaryType);
-			if (iBeneficiaryType != null)
-				response.setResponse("Success");
-		} catch (Exception e) {
-			logger.error("Update relationship failed with " + e.getMessage(), e);
-			response.setError(e);
-		}
-		logger.info("update relationship response " + response.toString());
-		return response.toString();
-	}
-
-	@CrossOrigin()
-	@ApiOperation(value = "Get beneficiary relationship", consumes = "application/json", produces = "application/json")
-	@Deprecated
-	@RequestMapping(value = "/get/relationship", method = RequestMethod.POST, produces = "application/json", headers = "Authorization")
-	public String getBeneficiaryRelation() {
-		OutputResponse response = new OutputResponse();
-		logger.info("Get relationship request");
-		try {
-			Iterable<BeneficiaryType> iBeneficiaryTypes = this.iemrBeneficiaryTypeService.getRelations();
-		} catch (Exception e) {
-			logger.error("get relationships failed with error " + e.getMessage(), e);
-			response.setError(e);
-		}
-		logger.info("Get relationship response " + response.toString());
-		return response.toString();
-	}
-
-	@CrossOrigin()
-	@Deprecated
-	@ApiOperation(value = "Search user by beneficiaryID")
-	@RequestMapping(value = "/searchUser/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
-	public String searchUser(@PathVariable("id") String beneficiaryId, HttpServletRequest httpRequest) {
-		logger.info("serach user beneficiaryId:" + beneficiaryId);
-		OutputResponse response = new OutputResponse();
-
-		String auth = httpRequest.getHeader(AUTHORIZATION);
-		try {
-			List<BeneficiaryModel> iBeneficiary = this.iemrSearchUserService.userExitsCheckWithId(beneficiaryId, auth,
-					false);
-			response.setResponse(OutputMapper.gsonWithoutExposeRestriction().toJson(iBeneficiary));
-		} catch (Exception e) {
-			logger.error("serach user failed with error " + e.getMessage(), e);
-			response.setError(e);
-		}
-		logger.info("Serach user response " + response.toString());
-		return response.toString();
-	}
-
-	@CrossOrigin()
-	@ApiOperation(value = "Provides the list of beneficiaries for given beneficiaryID")
+	@ApiOperation(value = "Provide the list of beneficiaries based on beneficiary id")
 	@RequestMapping(value = "/searchUserByID", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String searchUserByID(
 			@ApiParam("{\"beneficiaryRegID\":\"Long\", \"beneficiaryID\":\"Long\", \"HealthID\":\"String\", \"HealthIDNo\":\"String\"} ") @RequestBody String request,
@@ -321,7 +251,7 @@ public class BeneficiaryRegistrationController {
 		return response.toString();
 	}
 
-	@ApiOperation(value = "Provides the list of beneficiaries who has phone number provided")
+	@ApiOperation(value = "Provide the list of beneficiaries based on phone number")
 	@CrossOrigin()
 	@RequestMapping(value = "/searchUserByPhone", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String searchUserByPhone(
@@ -350,7 +280,7 @@ public class BeneficiaryRegistrationController {
 	}
 
 	@CrossOrigin()
-	@ApiOperation(value = "Provides the list of beneficiaries who match search criteria provided")
+	@ApiOperation(value = "Provide the list of beneficiaries based on search criteria")
 	@RequestMapping(value = "/searchBeneficiary", method = RequestMethod.POST, headers = "Authorization")
 	public String searchBeneficiary(
 			@ApiParam("{\"firstName\":\"String\",\"lastName\":\"String\",\"genderID\":\"Integer\",\"beneficiaryID\":\"String\","
@@ -373,7 +303,7 @@ public class BeneficiaryRegistrationController {
 	}
 
 	@CrossOrigin()
-	@ApiOperation(value = "Provides the all common data list needed for beneficiary registration")
+	@ApiOperation(value = "Provide all common data list needed for beneficiary registration")
 	@RequestMapping(value = "/getRegistrationData", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String getRegistrationData() {
 		OutputResponse response = new OutputResponse();
@@ -404,7 +334,7 @@ public class BeneficiaryRegistrationController {
 	}
 
 	@CrossOrigin()
-	@ApiOperation(value = "Provides the all common data list needed for beneficiary registration")
+	@ApiOperation(value = "Provide all common data V1 list needed for beneficiary registration")
 	@RequestMapping(value = "/getRegistrationDataV1", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String getRegistrationDataV1(
 			@ApiParam(value = "{\"providerServiceMapID\":\"Integer\"}") @RequestBody String request) {
@@ -438,7 +368,7 @@ public class BeneficiaryRegistrationController {
 	}
 
 	@CrossOrigin()
-	@ApiOperation(value = "Updating beneficiary details")
+	@ApiOperation(value = "Update beneficiary details")
 	@RequestMapping(value = "/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String updateBenefciary(
 			@ApiParam("{\"beneficiaryRegID\":\"Long\",\"firstName\":\"String\",\"lastName\":\"String\","
@@ -483,7 +413,7 @@ public class BeneficiaryRegistrationController {
 	}
 
 	@CrossOrigin()
-	@ApiOperation(value = "Fetching beneficiary details by phone no")
+	@ApiOperation(value = "Fetch beneficiary details by phone no")
 	@RequestMapping(value = "/getBeneficiariesByPhoneNo", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String getBeneficiariesByPhone(@ApiParam("{\"phoneNo\":\"String\"}") @RequestBody String request,
 			HttpServletRequest httpRequest) {
@@ -535,7 +465,7 @@ public class BeneficiaryRegistrationController {
 	}
 
 	@CrossOrigin()
-	@ApiOperation(value = "For Generating beneficiary IDs")
+	@ApiOperation(value = "Generate beneficiary id")
 	@RequestMapping(value = "/generateBeneficiaryIDs", headers = "Authorization", method = {
 			RequestMethod.POST }, produces = { "application/json" })
 	public String getBeneficiaryIDs(

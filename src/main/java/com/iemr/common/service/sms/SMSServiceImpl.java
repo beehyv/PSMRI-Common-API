@@ -28,6 +28,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -937,13 +938,16 @@ public class SMSServiceImpl implements SMSService {
 
 						// for fetching dltTemplateId
 						String dltTemplateId = smsTemplateRepository.findDLTTemplateID(sms.getSmsTemplateID());
+						if(dltTemplateId == null)
+							throw new Exception("No dltTemplateId template ID mapped");
 
 						SmsAPIRequestModel smsAPICredentials104 = new SmsAPIRequestModel(senderName, phoneNo,
-								sms.getSms(), sourceAddress, dltTemplateId, smsMessageType, smsEntityID);
+								sms.getSms(), sourceAddress, smsMessageType, dltTemplateId, smsEntityID);
 
 						MultiValueMap<String, String> headersLogin = new LinkedMultiValueMap<String, String>();
 						headersLogin.add("Content-Type", "application/json");
-						headersLogin.add("AUTHORIZATION", senderName + ":" + senderPassword);
+						String auth=senderName + ":" + senderPassword;
+						headersLogin.add("Authorization", "Basic "+Base64.getEncoder().encodeToString(auth.getBytes()));
 						// smsPublishURL = smsPublishURL.replace("SMS_TEXT",
 						// URLEncoder.encode(sms.getSms(), "UTF-8"))
 
@@ -958,7 +962,10 @@ public class SMSServiceImpl implements SMSService {
 						if (responseLogin.getStatusCodeValue() == 200 & responseLogin.hasBody()) {
 							String smsResponse = responseLogin.getBody();
 							JSONObject obj = new JSONObject(smsResponse);
-							String messageRequestId = obj.getString("MessageRequestId");
+							String messageRequestId = null;
+                            if(obj !=null)
+                            messageRequestId = obj.getString("messageRequestId");
+//							String messageRequestId = obj.getString("MessageRequestId");
 //							logger.info("SMS Sent successfully by calling API " + smsPublishURL);
 							sms.setTransactionError(null);
 							sms.setTransactionID(messageRequestId);

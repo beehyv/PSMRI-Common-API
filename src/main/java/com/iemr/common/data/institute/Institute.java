@@ -174,6 +174,10 @@ public class Institute
 	protected Institute()
 	{
 	}
+	
+	public String getInstituteName() {
+        return institutionName;
+    }
 
 	public Institute(Integer institutionID, String institutionName)
 	{

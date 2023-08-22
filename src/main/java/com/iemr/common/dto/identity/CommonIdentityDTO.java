@@ -58,7 +58,7 @@ public class CommonIdentityDTO {
 	private Integer ageAtMarriage;
 	private Integer educationId;
 	private String education;
-	private Boolean emergencyRegistration;
+	private Boolean emergencyRegistration = false;
 	private Integer healthCareWorkerId;
 	private String healthCareWorker;
 	private String fatherName;
@@ -88,6 +88,7 @@ public class CommonIdentityDTO {
 	private Integer titleId;
 	private String title;
 	private Integer zoneId;
+	private String monthlyFamilyIncome;
 
 	// address
 	private Address currentAddress;

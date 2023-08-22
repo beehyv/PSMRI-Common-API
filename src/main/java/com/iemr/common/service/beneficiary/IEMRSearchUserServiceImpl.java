@@ -277,6 +277,12 @@ public class IEMRSearchUserServiceImpl implements IEMRSearchUserService {
 			BigInteger numBig = new BigInteger(i_beneficiary.getBeneficiaryID());
 			identitySearchDTO.setBeneficiaryId(numBig);
 		}
+		
+		if(i_beneficiary.getIs1097() != null && i_beneficiary.getIs1097() == true) {
+            i_beneficiary.setIs1097(true);
+        }else {
+            i_beneficiary.setIs1097(false);
+        }
 
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		List<BeneficiariesDTO> listBen = identityBeneficiaryService

@@ -37,6 +37,7 @@ import com.iemr.common.service.email.EmailService;
 import com.iemr.common.utils.mapper.InputMapper;
 import com.iemr.common.utils.response.OutputResponse;
 
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 @RequestMapping(value = "/emailController")
@@ -45,28 +46,25 @@ public class EmailController {
 
 	InputMapper inputMapper = new InputMapper();
 	final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-	
+
 	private EmailService emailService;
 
-	/**
-	 * @param emailService the emailService to set
-	 */
 	@Autowired
 	public void setEmailService(EmailService emailService) {
 		this.emailService = emailService;
 	}
-	
+
 	@CrossOrigin
+	@ApiOperation(value = "Send email")
 	@RequestMapping(value = "/SendEmail", method = RequestMethod.POST, headers = "Authorization")
-	public String SendEmail(@ApiParam("{\"FeedbackID\":\"Long\",\"emailID\":\"String\",\"is1097\":\"Boolean\"}") @RequestBody String request, HttpServletRequest serverRequest)
-	{
+	public String SendEmail(
+			@ApiParam("{\"FeedbackID\":\"Long\",\"emailID\":\"String\",\"is1097\":\"Boolean\"}") @RequestBody String request,
+			HttpServletRequest serverRequest) {
 		OutputResponse response = new OutputResponse();
 		logger.info("SendEmail request " + request);
-		try
-		{
+		try {
 			response.setResponse(emailService.SendEmail(request, serverRequest.getHeader("Authorization")));
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			logger.error("SendEmail failed with error " + e.getMessage(), e);
 			response.setError(e);
 		}
@@ -76,33 +74,30 @@ public class EmailController {
 	}
 
 	@CrossOrigin()
-	@RequestMapping(value = "/getAuthorityEmailID", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON,
-			headers = "Authorization")
-	public String getAuthorityEmailID(@ApiParam(value = "{districtID : Integer}") @RequestBody String severityRequest)
-	{
+	@ApiOperation(value = "Get authority email id")
+	@RequestMapping(value = "/getAuthorityEmailID", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
+	public String getAuthorityEmailID(@ApiParam(value = "{districtID : Integer}") @RequestBody String severityRequest) {
 
 		OutputResponse response = new OutputResponse();
-		try
-		{
+		try {
 			response.setResponse(emailService.getAuthorityEmailID(severityRequest));
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			logger.error("", e);
 			response.setError(e);
 		}
 		return response.toString();
 	}
-	
+
 	@CrossOrigin
+	@ApiOperation(value = "Send email general")
 	@RequestMapping(value = "/sendEmailGeneral", method = RequestMethod.POST, headers = "Authorization")
-	public String sendEmailGeneral(@ApiParam("{\"requestID\":\"String\",\"emailType\":\"String\",\"emailID\":\"String\"}") @RequestBody String requestID, HttpServletRequest serverRequest)
-	{
+	public String sendEmailGeneral(
+			@ApiParam("{\"requestID\":\"String\",\"emailType\":\"String\",\"emailID\":\"String\"}") @RequestBody String requestID,
+			HttpServletRequest serverRequest) {
 		OutputResponse response = new OutputResponse();
-		try
-		{
-			response.setResponse(emailService.sendEmailGeneral(requestID,serverRequest.getHeader("Authorization")));
-		} catch (Exception e)
-		{
+		try {
+			response.setResponse(emailService.sendEmailGeneral(requestID, serverRequest.getHeader("Authorization")));
+		} catch (Exception e) {
 			logger.error("SendEmail failed with error " + e.getMessage(), e);
 			response.setError(e);
 		}

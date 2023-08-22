@@ -31,49 +31,38 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iemr.common.service.mctshistory.OutboundHistoryService;
 import com.iemr.common.utils.response.OutputResponse;
 
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 @RestController
-@RequestMapping(value="/mctsOutboundHistoryController")
+@RequestMapping(value = "/mctsOutboundHistoryController")
 public class OutboundHistoryController {
 
-	
 	private OutboundHistoryService outboundHistoryService;
-	
-	/**
-	 * @param outboundHistoryService the outboundHistoryService to set
-	 */
+
 	@Autowired
 	public void setOutboundHistoryService(OutboundHistoryService outboundHistoryService) {
 		this.outboundHistoryService = outboundHistoryService;
 	}
 
-	/**
-	 * api for reading call history
-	 * @param request
-	 * @return String count of allocated calls
-	 */
 	@CrossOrigin()
-	@RequestMapping(value="/getMctsCallHistory", method = RequestMethod.POST, headers = "Authorization")
-	public String getCallHistory(@ApiParam("{\"beneficiaryRegID\":\"Long\"}") @RequestBody String request){
-	
-		OutputResponse response  = new OutputResponse();
-		try{
-			
+	@ApiOperation(value = "Get MCTS call history")
+	@RequestMapping(value = "/getMctsCallHistory", method = RequestMethod.POST, headers = "Authorization")
+	public String getCallHistory(@ApiParam("{\"beneficiaryRegID\":\"Long\"}") @RequestBody String request) {
+
+		OutputResponse response = new OutputResponse();
+		try {
+
 			response.setResponse(outboundHistoryService.getCallHistory(request));
-		}catch (Exception e) {
-			
+		} catch (Exception e) {
+
 			response.setError(e);
 		}
-		return response.toStringWithSerialization(); 
+		return response.toStringWithSerialization();
 	}
-	
-	/**
-	 * api for reading call response
-	 * @param request
-	 * @return String count of allocated calls
-	 */
+
 	@CrossOrigin()
+	@ApiOperation(value = "Get MCTS call response")
 	@RequestMapping(value = "/getMctsCallResponse", method = RequestMethod.POST, headers = "Authorization")
 	public String getMctsCallResponse(@ApiParam("{\"callDetailID\":\"Long\"}") @RequestBody String request) {
 
@@ -87,6 +76,5 @@ public class OutboundHistoryController {
 		}
 		return response.toString();
 	}
-
 
 }

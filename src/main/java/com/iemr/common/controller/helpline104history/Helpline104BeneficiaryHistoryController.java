@@ -44,16 +44,16 @@ import io.swagger.annotations.ApiParam;
 
 @RequestMapping(value = "/beneficiary")
 @RestController
-public class H104BenHistoryController {
+public class Helpline104BeneficiaryHistoryController {
 	InputMapper inputMapper = new InputMapper();
-	private Logger logger = LoggerFactory.getLogger(H104BenHistoryController.class);
+	private Logger logger = LoggerFactory.getLogger(Helpline104BeneficiaryHistoryController.class);
 	
 	@Autowired
 	private H104BenHistoryServiceImpl smpleBenHistoryServiceImpl;
 	
 	@CrossOrigin
 	@ApiOperation(
-			value = "retrives cashesheet history",
+			value = "Retrieve beneficiary case record",
 			consumes = "application/json",
 			produces = "application/json")
 	@RequestMapping(value = "/get104BenMedHistory", method = RequestMethod.POST, headers = "Authorization")

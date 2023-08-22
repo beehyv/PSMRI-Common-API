@@ -114,6 +114,8 @@ public interface IEMRAdminUserService
 
 	String generateTransactionIdForPasswordChange(User user) throws Exception;
 
+	
+
 
 	
 }

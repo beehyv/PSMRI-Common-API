@@ -75,6 +75,7 @@ public class BenDetailDTO implements Serializable {
 	private Short healthCareWorkerId;
 	private String isHIVPositive;
 	private Integer beneficiaryAge;
+	private String monthlyFamilyIncome;
 
 	private Long houseHoldID;
 	private String guideLineID;

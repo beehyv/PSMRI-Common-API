@@ -19,7 +19,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
-package com.iemr.common.controller.nhm_dashboard;
+package com.iemr.common.controller.nhmdashboard;
 
 import java.util.Arrays;
 
@@ -43,13 +43,14 @@ import io.swagger.annotations.ApiOperation;
 
 @RequestMapping(value = "/nhm_dashboard")
 @RestController
-public class NHM_DashboardController {
+public class NationalHealthMissionDashboardController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 	@Autowired
 	private NHM_DashboardService nHM_DashboardService;
 
 	@CrossOrigin()
+	@ApiOperation(value = "Push abandoned calls from call centre")
 	@RequestMapping(value = "/push/abandon_calls", method = RequestMethod.POST, headers = "Authorization")
 	public String pushAbandonCallsFromC_Zentrix(@RequestBody AbandonCallSummary abandonCallSummary) {
 		OutputResponse output = new OutputResponse();
@@ -64,7 +65,7 @@ public class NHM_DashboardController {
 		return output.toString();
 	}
 
-	@ApiOperation(value = "Abandoned call information")
+	@ApiOperation(value = "Get abandoned call information")
 	@CrossOrigin()
 	@RequestMapping(value = "/get/abandon_calls", method = RequestMethod.GET, headers = "Authorization")
 	public String getAbandonCalls() {
@@ -80,7 +81,7 @@ public class NHM_DashboardController {
 		return output.toString();
 	}
 
-	@ApiOperation(value = "Agent wise staff time & Agent wise Idle time")
+	@ApiOperation(value = "Get agent wise staff & idle time")
 	@CrossOrigin()
 	@RequestMapping(value = "/get/agentsummaryreport", method = RequestMethod.GET, headers = "Authorization")
 	public String getAgentSummaryReport() {
@@ -96,7 +97,7 @@ public class NHM_DashboardController {
 		return output.toString();
 	}
 
-	@ApiOperation(value = "Call queue information")
+	@ApiOperation(value = "Get detailed call report")
 	@CrossOrigin()
 	@RequestMapping(value = "/get/detailedCallReport", method = RequestMethod.GET, headers = "Authorization")
 	public String getDetailedCallReport() {
@@ -111,49 +112,4 @@ public class NHM_DashboardController {
 		}
 		return output.toString();
 	}
-
-	@Deprecated
-	@CrossOrigin()
-	@RequestMapping(value = "/saveAgentSummaryReport", method = RequestMethod.POST, headers = "Authorization")
-	public String saveAgentSummaryReport(@RequestBody String request) {
-		OutputResponse output = new OutputResponse();
-		try {
-			AgentSummaryReport[] arr = InputMapper.gson().fromJson(request, AgentSummaryReport[].class);
-			output.setResponse(nHM_DashboardService.saveAgentSummaryReport(Arrays.asList(arr)));
-		} catch (Exception e) {
-			output.setError(5000, e.getLocalizedMessage());
-		}
-
-		return output.toString();
-	}
-
-	@Deprecated
-	@CrossOrigin()
-	@RequestMapping(value = "/saveDetailedCallReport", method = RequestMethod.POST, headers = "Authorization")
-	public String saveDetailedCallReport(@RequestBody String request) {
-		OutputResponse output = new OutputResponse();
-		try {
-			DetailedCallReport[] arr = InputMapper.gson().fromJson(request, DetailedCallReport[].class);
-			output.setResponse(nHM_DashboardService.saveDetailedCallReport(Arrays.asList(arr)));
-		} catch (Exception e) {
-			output.setError(5000, e.getLocalizedMessage());
-		}
-
-		return output.toString();
-	}
-
-	@Deprecated
-	@CrossOrigin()
-	@RequestMapping(value = "/check_Job", method = RequestMethod.GET, headers = "Authorization")
-	public String checkJob() {
-		OutputResponse output = new OutputResponse();
-		try {
-			output.setResponse(nHM_DashboardService.pull_NHM_Data_CTI());
-		} catch (Exception e) {
-			output.setError(5000, e.getLocalizedMessage());
-		}
-
-		return output.toString();
-	}
-
 }

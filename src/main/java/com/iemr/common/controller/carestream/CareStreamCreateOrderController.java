@@ -41,6 +41,7 @@ import com.iemr.common.data.carestream.CreateOrderData;
 import com.iemr.common.utils.mapper.InputMapper;
 import com.iemr.common.utils.response.OutputResponse;
 
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 @PropertySource("classpath:myapp.properties")
@@ -59,6 +60,7 @@ public class CareStreamCreateOrderController {
 	private int carestreamSocketPort;
 
 	@CrossOrigin()
+	@ApiOperation(value = "Create order")
 	@RequestMapping(value = "/createOrder", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
 	public String createOrder(@ApiParam("{\"firstName\":\"String\",\"middleName\":\"String\",\"LastName\":\"String\","
@@ -120,6 +122,7 @@ public class CareStreamCreateOrderController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Update order")
 	@RequestMapping(value = "/UpdateOrder", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
 	public String updateOrder(@ApiParam("{\"firstName\":\"String\",\"middleName\":\"String\",\"LastName\":\"String\","
@@ -181,6 +184,7 @@ public class CareStreamCreateOrderController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Delete order")
 	@RequestMapping(value = "/deleteOrder", headers = "Authorization", method = { RequestMethod.POST }, produces = {
 			"application/json" })
 	public String deleteOrder(@ApiParam("{\"firstName\":\"String\",\"middleName\":\"String\",\"LastName\":\"String\","

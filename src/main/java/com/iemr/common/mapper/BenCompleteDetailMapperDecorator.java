@@ -135,6 +135,9 @@ public abstract class BenCompleteDetailMapperDecorator implements BenCompleteDet
 			demographicsModel.setIncomeStatusName(benDetails.getIncomeStatus());
 			demographicsModel.setIncomeStatus(benDetails.getIncomeStatus());
 		}
+		if (benDetails.getMonthlyFamilyIncome() != null) {
+			demographicsModel.setMonthlyFamilyIncome(benDetails.getMonthlyFamilyIncome());
+		}
 		demographicsModel.setCreatedBy(createdBy);
 		demographicsModel.setPinCode(address.getPinCode());
 		demographicsModel.setAddressLine1(address.getAddrLine1());

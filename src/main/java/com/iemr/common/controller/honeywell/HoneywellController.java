@@ -36,6 +36,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iemr.common.service.honeywell.HoneywellService;
 import com.iemr.common.utils.mapper.InputMapper;
 import com.iemr.common.utils.response.OutputResponse;
+
+import io.swagger.annotations.ApiOperation;
+
 @CrossOrigin
 @RequestMapping({ "/honeywell" })
 @RestController
@@ -44,58 +47,49 @@ public class HoneywellController {
 	InputMapper inputMapper = new InputMapper();
 	@Autowired
 	private HoneywellService honeywellService;
+
 	@CrossOrigin
+	@ApiOperation(value = "Get real time district wise call report")
 	@RequestMapping(value = "/realtimeDistrictDistribution", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
-	public String getRealtimeDistrictWiseCallReport()
-	{
+	public String getRealtimeDistrictWiseCallReport() {
 		OutputResponse response = new OutputResponse();
-		try
-		{
+		try {
 			response.setResponse(honeywellService.getRealtimeDistrictWiseCallReport());
-		} catch (Exception e)
-		{
-			logger.error("getDistrictWiseCallReport failed with error " + e.getMessage(), e);
-			response.setError(e);
-		}
-		return response.toString();
-	}
-	@CrossOrigin
-	@RequestMapping(value = "/districtWiseCallDistribution", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON,
-			consumes = MediaType.APPLICATION_JSON, headers = "Authorization")
-	public String getDistrictWiseCallReport(
-			@RequestBody String request, HttpServletRequest httpRequest)
-	{
-		OutputResponse response = new OutputResponse();
-		logger.info("getDistrictWiseCallReport request "+request);
-		try
-		{
-			response.setResponse(honeywellService.getDistrictWiseCallReport(request));
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			logger.error("getDistrictWiseCallReport failed with error " + e.getMessage(), e);
 			response.setError(e);
 		}
 		return response.toString();
 	}
 
-	
 	@CrossOrigin
-	@RequestMapping(value = "/urban_rural_calls", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON,
-			consumes = MediaType.APPLICATION_JSON, headers = "Authorization")
-	public String getUrbanRuralCallReport(
-			@RequestBody String request, HttpServletRequest httpRequest)
-	{
+	@ApiOperation(value = "District wise call distribution")
+	@RequestMapping(value = "/districtWiseCallDistribution", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON, headers = "Authorization")
+	public String getDistrictWiseCallReport(@RequestBody String request, HttpServletRequest httpRequest) {
 		OutputResponse response = new OutputResponse();
-		logger.info("getUrbanRuralCallReport request "+request);
-		try
-		{
+		logger.info("getDistrictWiseCallReport request " + request);
+		try {
+			response.setResponse(honeywellService.getDistrictWiseCallReport(request));
+		} catch (Exception e) {
+			logger.error("getDistrictWiseCallReport failed with error " + e.getMessage(), e);
+			response.setError(e);
+		}
+		return response.toString();
+	}
+
+	@CrossOrigin
+	@ApiOperation(value = "Urban and rural calls")
+	@RequestMapping(value = "/urban_rural_calls", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON, headers = "Authorization")
+	public String getUrbanRuralCallReport(@RequestBody String request, HttpServletRequest httpRequest) {
+		OutputResponse response = new OutputResponse();
+		logger.info("getUrbanRuralCallReport request " + request);
+		try {
 			response.setResponse(honeywellService.getUrbanRuralCallReport(request));
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			logger.error("getUrbanRuralCallReport failed with error " + e.getMessage(), e);
 			response.setError(e);
 		}
 		return response.toString();
 	}
-	
+
 }

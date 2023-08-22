@@ -21,8 +21,6 @@
 */
 package com.iemr.common.controller.everwell.callhandle;
 
-
-
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
@@ -34,13 +32,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-
-
 import com.iemr.common.service.everwell.EverwellCallHandlingService;
 import com.iemr.common.utils.mapper.InputMapper;
 import com.iemr.common.utils.response.OutputResponse;
 
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+
 @RequestMapping(value = "/everwellCall")
 @RestController
 public class EverwellCallController {
@@ -48,23 +46,26 @@ public class EverwellCallController {
 	private EverwellCallHandlingService beneficiaryCallService;
 	InputMapper inputMapper = new InputMapper();
 	final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+
 	@CrossOrigin()
+	@ApiOperation(value = "Outbound call count")
 	@RequestMapping(value = "/outboundCallCount", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
-	public String outboundCallCount(@ApiParam(value = "{\"providerServiceMapID\":\"called service ID integer\", " 
+	public String outboundCallCount(@ApiParam(value = "{\"providerServiceMapID\":\"called service ID integer\", "
 			+ "\"assignedUserID\":\"Optional - Integer user id to whom calls are assigned\"}") @RequestBody String request) {
 		OutputResponse response = new OutputResponse();
 		try {
 			logger.info("outboundCallCount request " + request);
-//			System.out.println("req="+request);
 			response.setResponse(beneficiaryCallService.outboundCallCount(request));
 		} catch (Exception e) {
 			logger.error("outboundCallList failed with error " + e.getMessage(), e);
 			response.setError(e);
 		}
-        
+
 		return response.toString();
 	}
+
 	@CrossOrigin()
+	@ApiOperation(value = "Outbound allocation")
 	@RequestMapping(value = "/outboundAllocation", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String outboundAllocation(@ApiParam(value = "{\"AgentID\":[Integer Array list of Agent IDs], "
 			+ "\"allocateNo\":\"Integer - number of calls to be allocated for user\", "
@@ -79,12 +80,14 @@ public class EverwellCallController {
 
 		return response.toString();
 	}
+
 	@CrossOrigin()
+	@ApiOperation(value = "Outbound call list")
 	@RequestMapping(value = "/outboundCallList", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String outboundCallList(@ApiParam(value = "{\"providerServiceMapID\":\" called service ID integer\", "
 			+ "\"AgentID\":\"Optional - Integer ID of agent that is assigned to\"}") @RequestBody String request) {
 		OutputResponse response = new OutputResponse();
-		//String auth = httpRequest.getHeader("authorization");
+		// String auth = httpRequest.getHeader("authorization");
 		try {
 			response.setResponse(beneficiaryCallService.outboundCallList(request));
 		} catch (Exception e) {
@@ -94,7 +97,9 @@ public class EverwellCallController {
 
 		return response.toString();
 	}
+
 	@CrossOrigin()
+	@ApiOperation(value = "Reset outbound call")
 	@RequestMapping(value = "/resetOutboundCall", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String resetOutboundCall(
 			@ApiParam(value = "{\"EAPIIDs\":\"[Integer - Array of Outbound call ids]\"}") @RequestBody String request) {
@@ -108,7 +113,9 @@ public class EverwellCallController {
 
 		return response.toString();
 	}
+
 	@CrossOrigin()
+	@ApiOperation(value = "Save feedback")
 	@RequestMapping(value = "/saveFeedback", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String saveCallDetails(
 			@ApiParam(value = "{\"EAPIIDs\":\"[Integer - Array of Outbound call ids]\"}") @RequestBody String request) {
@@ -122,53 +129,19 @@ public class EverwellCallController {
 
 		return response.toString();
 	}
+
 	@CrossOrigin()
+	@ApiOperation(value = "Complete outbound call")
 	@RequestMapping(value = "/completeOutboundCall", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String completeOutboundCall(@ApiParam(value = "{\"EAPIID\":\"Integer - Outbound call id\", "
 			+ "\"isCompleted\":\"Boolean - Value indicating call is completed/pending\"}") @RequestBody String request) {
 		OutputResponse response = new OutputResponse();
 		try {
-			String s=beneficiaryCallService.completeOutboundCall(request);
-			if(s.equalsIgnoreCase("success"))
-			response.setResponse(s);
-			else
-				response.setError(5000,"error in updating data");
-		} catch (Exception e) {
-			logger.error("outboundAllocation failed with error " + e.getMessage(), e);
-			response.setError(e);
-		}
-		return response.toString();
-	}
-	
-	@Deprecated
-	@CrossOrigin()
-	@RequestMapping(value = "/updateIncompleteCallStatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
-	public String updateIncompleteCallStatus(@ApiParam(value = "") @RequestBody String request) {	
-		
-		OutputResponse response = new OutputResponse();
-		try {
-			String s=beneficiaryCallService.updateIncompleteCallStatus(request);
-			if(s.equalsIgnoreCase("success"))
-				response.setResponse("Data saved successfully");
-			else
-				response.setError(5000,"error in updating data");
-		} catch (Exception e) {
-			logger.error("outboundAllocation failed with error " + e.getMessage(), e);
-			response.setError(e);
-		}
-		return response.toString();
-	}
-	
-	@CrossOrigin()
-	@RequestMapping(value = "/getEverwellfeedbackDetails", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
-	public String getEverwellfeedbackDetails(@ApiParam(value = "{\"EverwellID\":\"Integer - Everwell id\"}") @RequestBody String request) {
-		OutputResponse response = new OutputResponse();
-		try {
-			String s=beneficiaryCallService.getEverwellFeedback(request);
-			if(s!=null)
+			String s = beneficiaryCallService.completeOutboundCall(request);
+			if (s.equalsIgnoreCase("success"))
 				response.setResponse(s);
 			else
-				response.setError(5000,"error in fetching data");
+				response.setError(5000, "error in updating data");
 		} catch (Exception e) {
 			logger.error("outboundAllocation failed with error " + e.getMessage(), e);
 			response.setError(e);
@@ -177,8 +150,29 @@ public class EverwellCallController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Get everwell feedback details")
+	@RequestMapping(value = "/getEverwellfeedbackDetails", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
+	public String getEverwellfeedbackDetails(
+			@ApiParam(value = "{\"EverwellID\":\"Integer - Everwell id\"}") @RequestBody String request) {
+		OutputResponse response = new OutputResponse();
+		try {
+			String s = beneficiaryCallService.getEverwellFeedback(request);
+			if (s != null)
+				response.setResponse(s);
+			else
+				response.setError(5000, "error in fetching data");
+		} catch (Exception e) {
+			logger.error("outboundAllocation failed with error " + e.getMessage(), e);
+			response.setError(e);
+		}
+		return response.toString();
+	}
+
+	@CrossOrigin()
+	@ApiOperation(value = "Outbound call list with mobile number")
 	@RequestMapping(value = "/outboundCallListWithMobileNumber", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
-	public String outboundCallListWithMobileNumber(@ApiParam(value = "{\"PrimaryNumber\":\"PrimaryNumber\", \"providerServiceMapID\":\"called service ID integer\"}") @RequestBody String request) {
+	public String outboundCallListWithMobileNumber(
+			@ApiParam(value = "{\"PrimaryNumber\":\"PrimaryNumber\", \"providerServiceMapID\":\"called service ID integer\"}") @RequestBody String request) {
 		OutputResponse response = new OutputResponse();
 		try {
 			response.setResponse(beneficiaryCallService.outboundCallListWithMobileNumber(request));
@@ -189,11 +183,8 @@ public class EverwellCallController {
 		return response.toString();
 	}
 
-	/***
-	 * @author SH20094090
-	 * @purpose check if call already completed
-	 ***/
 	@CrossOrigin()
+	@ApiOperation(value = "Check if already called")
 	@RequestMapping(value = "/checkIfAlreadyCalled", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String checkIfCalledOrNot(@ApiParam(value = "{\"providerServiceMapID\":\" called service ID integer\", "
 			+ "\"eapiId\":\" Integer\"}") @RequestBody String request) {

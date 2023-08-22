@@ -153,7 +153,7 @@ public class DetailedCallReport {
 	private Integer Hold_Num_Times;
 	@Expose
 	@Column(name = "CallerId")
-	private Integer Caller_Id;
+	private String Caller_Id;
 	@Expose
 	@Column(name = "Channel")
 	private String Channel;

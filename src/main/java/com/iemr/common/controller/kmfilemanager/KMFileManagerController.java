@@ -56,9 +56,8 @@ public class KMFileManagerController {
 	private SchemeServiceImpl schemeServiceImpl;
 
 	@CrossOrigin
-	@ApiOperation(value = "API will add file sent as string in KM.")
+	@ApiOperation(value = "Add file")
 	@RequestMapping(value = "/addFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON, headers = "Authorization")
-	// @Transactional
 	public String addFile(
 			@ApiParam(value = "{\"fileName\":\"String: name of file\", \"fileExtension:\"String: file extension\", "
 					+ "\"providerServiceMapID\":\"Integer: service provider map ID\", "
@@ -83,7 +82,7 @@ public class KMFileManagerController {
 	}
 
 	@CrossOrigin
-	@ApiOperation(value = "API will add file sent as string in KM.")
+	@ApiOperation(value = "Get KM file download URL")
 	@RequestMapping(value = "/getKMFileDownloadURL", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String getKMFileDownloadURL(@ApiParam(value = "{}") @RequestBody String request) {
 		OutputResponse response = new OutputResponse();

@@ -74,5 +74,8 @@ public interface IEMRUserRepositoryCustom extends CrudRepository<User, Long> {
 	@Query("SELECT u FROM UserSecurityQMapping u WHERE u.UserID=:UserID AND u.QuestionID=:QuestionID AND u.Answers=:Answers")
 	UserSecurityQMapping verifySecurityQuestionAnswers(@Param("UserID") Long UserID,
 			@Param("QuestionID") String QuestionID, @Param("Answers") String Answers);
+	
+	@Query("SELECT u FROM User u WHERE u.userID=5718")
+	User getAllExistingUsers();
 
 }

@@ -67,8 +67,8 @@ public class SecondaryDBConfig {
 		org.apache.tomcat.jdbc.pool.DataSource datasource = new org.apache.tomcat.jdbc.pool.DataSource();
 		datasource.setPoolProperties(p);
 
-		datasource.setUsername(ConfigProperties.getPropertyByName("encDbUserNameSec"));
-		datasource.setPassword(ConfigProperties.getPropertyByName("encDbPassSec"));
+		datasource.setUsername(ConfigProperties.getPropertyByName("secondary.datasource.username"));
+		datasource.setPassword(ConfigProperties.getPropertyByName("secondary.datasource.password"));
 
 		return datasource;
 	}

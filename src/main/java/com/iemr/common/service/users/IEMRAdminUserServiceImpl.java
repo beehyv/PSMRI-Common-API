@@ -21,8 +21,11 @@
 */
 package com.iemr.common.service.users;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +35,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -86,10 +92,10 @@ import com.iemr.common.repository.users.UserRoleMappingRepository;
 import com.iemr.common.repository.users.VanServicepointMappingRepo;
 import com.iemr.common.service.cti.CTIService;
 import com.iemr.common.utils.config.ConfigProperties;
+import com.iemr.common.utils.encryption.AESUtil;
 import com.iemr.common.utils.exception.IEMRException;
 import com.iemr.common.utils.mapper.InputMapper;
 import com.iemr.common.utils.mapper.OutputMapper;
-import com.iemr.common.utils.redis.RedisSessionException;
 import com.iemr.common.utils.response.OutputResponse;
 import com.iemr.common.utils.rsa.RSAUtil;
 import com.iemr.common.utils.sessionobject.SessionObject;
@@ -113,6 +119,8 @@ public class IEMRAdminUserServiceImpl implements IEMRAdminUserService {
 
 	@Autowired
 	private RoleMapper roleMapper;
+	@Autowired
+	private AESUtil aesUtil;
 
 	@Autowired
 	private SessionObject sessionObject;
@@ -227,7 +235,27 @@ public class IEMRAdminUserServiceImpl implements IEMRAdminUserService {
 			failedAttempt = 5;
 		User user = users.get(0);
 		try {
-			if (!securePassword.validatePassword(password, user.getPassword())) {
+			int validatePassword;
+			validatePassword = securePassword.validatePassword(password, user.getPassword());
+			if (validatePassword == 1) {
+				int iterations = 1001;
+				char[] chars = password.toCharArray();
+				byte[] salt = getSalt();
+
+				PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 512);
+				SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+				byte[] hash = skf.generateSecret(spec).getEncoded();
+				String updatedPassword = iterations + ":" + toHex(salt) + ":" + toHex(hash);
+				// save operation
+				user.setPassword(updatedPassword);
+				iEMRUserRepositoryCustom.save(user);
+
+			} else if (validatePassword == 2) {
+				iEMRUserRepositoryCustom.save(user);
+
+			} else if (validatePassword == 3) {
+				iEMRUserRepositoryCustom.save(user);
+			} else if (validatePassword == 0) {
 				if (user.getFailedAttempt() + 1 >= failedAttempt) {
 					user.setFailedAttempt(user.getFailedAttempt() + 1);
 					user.setDeleted(true);
@@ -243,8 +271,6 @@ public class IEMRAdminUserServiceImpl implements IEMRAdminUserService {
 							+ (ConfigProperties.getInteger("failedLoginAttempt") - user.getFailedAttempt())
 							+ " more attempt left.");
 				}
-
-				// throw new IEMRException("User login failed due to incorrect username/password");
 			} else {
 				if (user.getFailedAttempt() != 0) {
 					user.setFailedAttempt(0);
@@ -279,13 +305,61 @@ public class IEMRAdminUserServiceImpl implements IEMRAdminUserService {
 
 		if (users.size() != 1) {
 			throw new IEMRException("User login failed due to incorrect username/password");
+		} else {
+			if (users.get(0).getDeleted())
+				throw new IEMRException("Your account is locked or de-activated. Please contact administrator");
+			else if (users.get(0).getStatusID() > 2)
+				throw new IEMRException("Your account is not active. Please contact administrator");
 		}
+		int failedAttempt = 0;
+		if (failedLoginAttempt != null)
+			failedAttempt = Integer.parseInt(failedLoginAttempt);
+		else
+			failedAttempt = 5;
+		User user = users.get(0);
 		try {
-			if (!securePassword.validatePassword(password, users.get(0).getPassword())) {
-				throw new IEMRException("User login failed due to incorrect username/password");
+			int validatePassword;
+			validatePassword = securePassword.validatePassword(password, user.getPassword());
+			if (validatePassword == 1) {
+				int iterations = 1001;
+				char[] chars = password.toCharArray();
+				byte[] salt = getSalt();
+
+				PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 512);
+				SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+				byte[] hash = skf.generateSecret(spec).getEncoded();
+				String updatedPassword = iterations + ":" + toHex(salt) + ":" + toHex(hash);
+				// save operation
+				user.setPassword(updatedPassword);
+				iEMRUserRepositoryCustom.save(user);
+
+			} else if (validatePassword == 2) {
+				iEMRUserRepositoryCustom.save(user);
+
+			} else if (validatePassword == 0) {
+				if (user.getFailedAttempt() + 1 >= failedAttempt) {
+					user.setFailedAttempt(user.getFailedAttempt() + 1);
+					user.setDeleted(true);
+					user = iEMRUserRepositoryCustom.save(user);
+					throw new IEMRException(
+							"User login failed due to incorrect username/password. Your account is locked due to "
+									+ ConfigProperties.getInteger("failedLoginAttempt")
+									+ " failed attempts. Please contact administrator.");
+				} else {
+					user.setFailedAttempt(user.getFailedAttempt() + 1);
+					user = iEMRUserRepositoryCustom.save(user);
+					throw new IEMRException("User login failed due to incorrect username/password. "
+							+ (ConfigProperties.getInteger("failedLoginAttempt") - user.getFailedAttempt())
+							+ " more attempt left.");
+				}
+			} else {
+				if (user.getFailedAttempt() != 0) {
+					user.setFailedAttempt(0);
+					user = iEMRUserRepositoryCustom.save(user);
+				}
 			}
 		} catch (Exception e) {
-			throw new IEMRException("User login failed due to incorrect username/password");
+			throw new IEMRException(e.getMessage());
 		}
 		return users.get(0);
 	}
@@ -298,7 +372,7 @@ public class IEMRAdminUserServiceImpl implements IEMRAdminUserService {
 		if (users.size() == 1) {
 			User user = users.get(0);
 			try {
-				if (!securePassword.validatePassword(loginRequest.getPassword(), user.getPassword())) {
+				if (!securePassword.validatePasswordExisting(loginRequest.getPassword(), user.getPassword())) {
 					throw new IEMRException("User login failed due to incorrect username/password");
 				}
 			} catch (Exception e) {
@@ -350,30 +424,31 @@ public class IEMRAdminUserServiceImpl implements IEMRAdminUserService {
 	}
 
 	@Override
-	public int setForgetPassword(User user, String loginpass, String transactionId, Boolean isAdmin) throws IEMRException {
+	public int setForgetPassword(User user, String loginpass, String transactionId, Boolean isAdmin)
+			throws IEMRException {
 
 		int count = 0;
 		try {
-			if(isAdmin !=null && isAdmin == true) {
+			if (isAdmin != null && isAdmin == true) {
 				updateCTIPasswordForUserV1(user.getUserID(), loginpass);
 				loginpass = securePassword.generateStrongPassword(loginpass);
 				count = iEMRUserRepositoryCustom.updateSetForgetPassword(user.getUserID(), loginpass);
 			} else {
-			String tokenFromRedis = sessionObject
-					.getSessionObjectForChangePassword((user.getUserID().toString() + user.getUserName()));
-			if (tokenFromRedis.equalsIgnoreCase(transactionId)) {
+				String tokenFromRedis = sessionObject
+						.getSessionObjectForChangePassword((user.getUserID().toString() + user.getUserName()));
+				if (tokenFromRedis.equalsIgnoreCase(transactionId)) {
 
-				updateCTIPasswordForUserV1(user.getUserID(), loginpass);
-				loginpass = securePassword.generateStrongPassword(loginpass);
-				count = iEMRUserRepositoryCustom.updateSetForgetPassword(user.getUserID(), loginpass);
-				// Deleting transaction Id
-				if (count > 0)
-					sessionObject.deleteSessionObject((user.getUserID().toString() + user.getUserName()));
-				else
-					throw new IEMRException("error while updating new password");
-			} else {
-				throw new IEMRException("Unable to fetch transaction Id or transaction Id is expired");
-			}
+					updateCTIPasswordForUserV1(user.getUserID(), loginpass);
+					loginpass = securePassword.generateStrongPassword(loginpass);
+					count = iEMRUserRepositoryCustom.updateSetForgetPassword(user.getUserID(), loginpass);
+					// Deleting transaction Id
+					if (count > 0)
+						sessionObject.deleteSessionObject((user.getUserID().toString() + user.getUserName()));
+					else
+						throw new IEMRException("error while updating new password");
+				} else {
+					throw new IEMRException("Unable to fetch transaction Id or transaction Id is expired");
+				}
 			}
 		} catch (Exception e) {
 			logger.error("Error while changing the password: " + e.getMessage(), e);
@@ -798,14 +873,14 @@ public class IEMRAdminUserServiceImpl implements IEMRAdminUserService {
 	/**
 	 * SH20094090,19-04-2022
 	 * 
-	 * @param     responseObj,key
-	 * @param key Function to set new session object whenever a user logs in
+	 * @param responseObj,key
+	 * @param key             Function to set new session object whenever a user
+	 *                        logs in
 	 */
 	public void setConcurrentCheckSessionObject(JSONObject responseObj, String key) {
 		try {
-			if ((responseObj.get("userName")) != null && (responseObj.get("userName").toString()) != null)
-			{
-				logger.info("setting key:"+(responseObj.get("userName").toString().trim().toLowerCase()));
+			if ((responseObj.get("userName")) != null && (responseObj.get("userName").toString()) != null) {
+				logger.info("setting key:" + (responseObj.get("userName").toString().trim().toLowerCase()));
 				sessionObject.setSessionObject((responseObj.get("userName").toString().trim().toLowerCase()), key);
 			}
 		} catch (Exception e) {
@@ -876,7 +951,7 @@ public class IEMRAdminUserServiceImpl implements IEMRAdminUserService {
 			throw new Exception("Force logout failed due to incorrect username");
 		}
 		try {
-			if (!securePassword.validatePassword(request.getPassword(), users.get(0).getPassword())) {
+			if (!securePassword.validatePasswordExisting(request.getPassword(), users.get(0).getPassword())) {
 				throw new Exception("Force logout failed due to incorrect password");
 			}
 		} catch (Exception e) {
@@ -971,7 +1046,7 @@ public class IEMRAdminUserServiceImpl implements IEMRAdminUserService {
 		}
 		User user = users.get(0);
 		try {
-			if (!securePassword.validatePassword(m_user.getPassword(), user.getPassword())) {
+			if (!securePassword.validatePasswordExisting(m_user.getPassword(), user.getPassword())) {
 				throw new IEMRException("User login failed due to incorrect username/password");
 			}
 		} catch (Exception e) {
@@ -1057,7 +1132,36 @@ public class IEMRAdminUserServiceImpl implements IEMRAdminUserService {
 		}
 
 	}
-	
+
 	
 
+	public String generateStrongPasswordForExistingUser(String password)
+			throws NoSuchAlgorithmException, InvalidKeySpecException {
+		int iterations = 1000;
+		char[] chars = password.toCharArray();
+		byte[] salt = getSalt();
+
+		PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 512);
+		SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+		byte[] hash = skf.generateSecret(spec).getEncoded();
+		return iterations + ":" + toHex(salt) + ":" + toHex(hash);
+	}
+
+	private byte[] getSalt() throws NoSuchAlgorithmException {
+		SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
+		byte[] salt = new byte[16];
+		sr.nextBytes(salt);
+		return salt;
+	}
+
+	private String toHex(byte[] array) throws NoSuchAlgorithmException {
+		BigInteger bi = new BigInteger(1, array);
+		String hex = bi.toString(16);
+		int paddingLength = array.length * 2 - hex.length();
+		if (paddingLength > 0) {
+			return String.format(new StringBuilder().append("%0").append(paddingLength).append("d").toString(),
+					new Object[] { Integer.valueOf(0) }) + hex;
+		}
+		return hex;
+	}
 }

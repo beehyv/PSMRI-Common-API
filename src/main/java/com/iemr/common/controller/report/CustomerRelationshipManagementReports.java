@@ -19,7 +19,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
-package com.iemr.common.controller.services;
+package com.iemr.common.controller.report;
 
 import javax.ws.rs.core.MediaType;
 
@@ -27,43 +27,46 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.iemr.common.service.services.Services;
-import com.iemr.common.service.services.ServicesImpl;
+import com.iemr.common.mapper.Report1097Mapper;
+import com.iemr.common.service.reports.CallReportsService;
+import com.iemr.common.utils.mapper.InputMapper;
 import com.iemr.common.utils.response.OutputResponse;
 
-@RequestMapping({ "/service" })
+import io.swagger.annotations.ApiOperation;
+
+@CrossOrigin
+@RequestMapping({ "/crmReports" })
 @RestController
-public class ServiceController
-{
-	final private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-	private Services services;
+public class CustomerRelationshipManagementReports {
+
+	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+	InputMapper inputMapper = new InputMapper();
+
+	private CallReportsService callReportsService;
 
 	@Autowired
-	public void setServices(ServicesImpl services)
-	{
-		this.services = services;
+	public void setCallReportsService(CallReportsService callReportsService) {
+		this.callReportsService = callReportsService;
 	}
 
+	@Autowired
+	Report1097Mapper mapper;
+
 	@CrossOrigin()
-	@RequestMapping(value = "/serviceList", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
-	public String serviceList(@RequestBody String request)
-	{
+	@ApiOperation(value = "QA report type master data", consumes = "application/json", produces = "application/json")
+	@RequestMapping(value = "/getReportTypes/{providerServiceMapID}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+	public String patientAppChiefComplaintsMasterData(
+			@PathVariable("providerServiceMapID") Integer providerServiceMapID) throws Exception {
+		logger.info("QA report type master Data for " + " providerServiceMapID:" + providerServiceMapID);
+		;
 		OutputResponse response = new OutputResponse();
-		logger.info("serviceList request: " + request);
-		try
-		{
-			response.setResponse(services.servicesList().toString());
-		} catch (Exception e)
-		{
-			logger.error("serviceList failed with error " + e.getMessage(), e);
-			response.setError(e);
-		}
-		logger.info("serviceList response: " + response.toString());
+		response.setResponse(callReportsService.getReportTypes(providerServiceMapID));
+		logger.info("Nurse master Data for categoryID:" + response.toString());
 		return response.toString();
 	}
 }

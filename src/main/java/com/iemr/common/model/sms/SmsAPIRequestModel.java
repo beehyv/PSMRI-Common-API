@@ -1,6 +1,11 @@
 package com.iemr.common.model.sms;
 
-public class SmsAPIRequestModel {
+import java.io.Serializable;
+
+import lombok.Data;
+
+@Data
+public class SmsAPIRequestModel implements Serializable{
 	
 	private String customerId;
 	private StringBuffer destinationAddress;

@@ -69,8 +69,8 @@ public class PrimaryDBConfig {
 		org.apache.tomcat.jdbc.pool.DataSource datasource = new org.apache.tomcat.jdbc.pool.DataSource();
 		datasource.setPoolProperties(p);
 
-		datasource.setUsername(ConfigProperties.getPropertyByName("encDbUserName"));
-		datasource.setPassword(ConfigProperties.getPropertyByName("encDbPass"));
+		datasource.setUsername(ConfigProperties.getPropertyByName("spring.datasource.username"));
+		datasource.setPassword(ConfigProperties.getPropertyByName("spring.datasource.password"));
 
 		return datasource;
 	}

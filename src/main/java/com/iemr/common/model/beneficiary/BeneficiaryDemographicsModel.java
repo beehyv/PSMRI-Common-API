@@ -33,9 +33,11 @@ import com.iemr.common.model.userbeneficiary.LanguageModel;
 import com.iemr.common.model.userbeneficiary.ReligionModel;
 import com.iemr.common.model.userbeneficiary.StateModel;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class BeneficiaryDemographicsModel {
 	@Expose
 	private Long benDemographicsID;
@@ -177,6 +179,8 @@ public class BeneficiaryDemographicsModel {
 	private String incomeStatus;
 	@Expose
 	private String religion;
+	@Expose
+	private String monthlyFamilyIncome;
 
 	public BeneficiaryDemographicsModel() {
 

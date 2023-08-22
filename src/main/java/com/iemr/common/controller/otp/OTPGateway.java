@@ -38,15 +38,8 @@ import com.iemr.common.service.otp.OTPHandler;
 import com.iemr.common.utils.mapper.InputMapper;
 import com.iemr.common.utils.response.OutputResponse;
 
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-
-/***
- * 
- * @author NE298657
- * @date DD/MM/YYYY - 10/08/2020
- * 
- * @implSpec handle OTP flow request and response
- */
 
 @RestController
 @RequestMapping(value = "/otp")
@@ -56,16 +49,10 @@ public class OTPGateway {
 	@Autowired
 	private OTPHandler otpHandler;
 
-	/***
-	 * 
-	 * @param requestOBJ
-	 * @apiNote send OTP for authentication
-	 * @return
-	 * 
-	 */
 	@CrossOrigin()
+	@ApiOperation(value = "Send OTP")
 	@RequestMapping(value = "/sendOTP", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
-	public String sendOTP(@ApiParam(value="{\"mobNo\":\"String\"}") @RequestBody String requestOBJ) {
+	public String sendOTP(@ApiParam(value = "{\"mobNo\":\"String\"}") @RequestBody String requestOBJ) {
 
 		OutputResponse response = new OutputResponse();
 
@@ -85,15 +72,11 @@ public class OTPGateway {
 		return response.toString();
 	}
 
-	/***
-	 * 
-	 * @param requestOBJ
-	 * @apiNote validate OTP for authorization, and on success generate AuthKey
-	 * @return
-	 */
 	@CrossOrigin()
+	@ApiOperation(value = "Validate OTP")
 	@RequestMapping(value = "/validateOTP", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
-	public String validateOTP(@ApiParam(value="{\"mobNo\":\"String\",\"otp\":\"Integer\"}") @RequestBody String requestOBJ) {
+	public String validateOTP(
+			@ApiParam(value = "{\"mobNo\":\"String\",\"otp\":\"Integer\"}") @RequestBody String requestOBJ) {
 
 		OutputResponse response = new OutputResponse();
 
@@ -114,8 +97,9 @@ public class OTPGateway {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Resend OTP")
 	@RequestMapping(value = "/resendOTP", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
-	public String resendOTP(@ApiParam(value="{\"mobNo\":\"String\"}") @RequestBody String requestOBJ) {
+	public String resendOTP(@ApiParam(value = "{\"mobNo\":\"String\"}") @RequestBody String requestOBJ) {
 
 		OutputResponse response = new OutputResponse();
 

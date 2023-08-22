@@ -21,6 +21,8 @@
 */
 package com.iemr.common.controller.users;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,7 +71,6 @@ import com.iemr.common.utils.sessionobject.SessionObject;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
-// @CrossOrigin()
 @RequestMapping("/user")
 @RestController
 public class IEMRAdminController {
@@ -76,12 +78,12 @@ public class IEMRAdminController {
 	private InputMapper inputMapper = new InputMapper();
 
 	private IEMRAdminUserService iemrAdminUserServiceImpl;
-	
+
 	private AESUtil aesUtil;
 
 	@Autowired
 	public void setAesUtil(AESUtil aesUtil) {
-	this.aesUtil = aesUtil;
+		this.aesUtil = aesUtil;
 	}
 
 	@Autowired
@@ -100,6 +102,7 @@ public class IEMRAdminController {
 	SecurePassword securePassword;
 
 	@CrossOrigin()
+	@ApiOperation(value = "New user authentication")
 	@RequestMapping(value = "/userAuthenticateNew", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
 	public String userAuthenticateNew(
 			@ApiParam(value = "\"{\\\"userName\\\":\\\"String\\\",\\\"password\\\":\\\"String\\\"}\"") @RequestBody String jsonRequest) {
@@ -114,6 +117,7 @@ public class IEMRAdminController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "User authentication")
 	@RequestMapping(value = "/userAuthenticate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
 	public String userAuthenticate(
 			@ApiParam(value = "\"{\\\"userName\\\":\\\"String\\\",\\\"password\\\":\\\"String\\\"}\"") @RequestBody LoginRequestModel m_User,
@@ -129,18 +133,14 @@ public class IEMRAdminController {
 			JSONObject serviceRoleMap = new JSONObject();
 			JSONArray serviceRoleList = new JSONArray();
 			JSONObject previlegeObj = new JSONObject();
-			//condition added to check for concurrent login
-			if(m_User.getUserName() !=null && (m_User.getDoLogout() ==null || m_User.getDoLogout() == false))
-			{
-				String tokenFromRedis=getConcurrentCheckSessionObjectAgainstUser(m_User.getUserName().trim().toLowerCase());
-				if (tokenFromRedis !=null)
-				{
-					//response.setError(5005, "You are already logged in,please confirm to logout from other device and login again");
-					throw new IEMRException("You are already logged in,please confirm to logout from other device and login again");
+			if (m_User.getUserName() != null && (m_User.getDoLogout() == null || m_User.getDoLogout() == false)) {
+				String tokenFromRedis = getConcurrentCheckSessionObjectAgainstUser(
+						m_User.getUserName().trim().toLowerCase());
+				if (tokenFromRedis != null) {
+					throw new IEMRException(
+							"You are already logged in,please confirm to logout from other device and login again");
 				}
-			}
-			else if(m_User.getUserName() !=null && m_User.getDoLogout() !=null && m_User.getDoLogout() == true)
-			{
+			} else if (m_User.getUserName() != null && m_User.getDoLogout() != null && m_User.getDoLogout() == true) {
 				deleteSessionObject(m_User.getUserName().trim().toLowerCase());
 			}
 			if (mUser.size() == 1) {
@@ -171,8 +171,9 @@ public class IEMRAdminController {
 		logger.info("userAuthenticate response " + response.toString());
 		return response.toString();
 	}
-	
+
 	@CrossOrigin()
+	@ApiOperation(value = "Log out user from concurrent session")
 	@RequestMapping(value = "/logOutUserFromConcurrentSession", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
 	public String logOutUserFromConcurrentSession(
 			@ApiParam(value = "\"{\\\"userName\\\":\\\"String\\\"}\"") @RequestBody LoginRequestModel m_User,
@@ -180,8 +181,7 @@ public class IEMRAdminController {
 		OutputResponse response = new OutputResponse();
 		logger.info("logOutUserFromConcurrentSession request - " + m_User);
 		try {
-			if(m_User!= null && m_User.getUserName() !=null)
-			{
+			if (m_User != null && m_User.getUserName() != null) {
 				List<User> mUsers = iemrAdminUserServiceImpl.userExitsCheck(m_User.getUserName());
 
 				if (mUsers == null || mUsers.size() <= 0) {
@@ -189,22 +189,19 @@ public class IEMRAdminController {
 				} else if (mUsers.size() > 1)
 					throw new IEMRException("More than 1 user found, please contact administrator");
 				else if (mUsers.size() == 1) {
-				String previousTokenFromRedis = sessionObject
+					String previousTokenFromRedis = sessionObject
 							.getSessionObject((mUsers.get(0).getUserName().toString().trim().toLowerCase()));
-				if (previousTokenFromRedis != null) {
-					deleteSessionObjectByGettingSessionDetails(previousTokenFromRedis);
-					sessionObject.deleteSessionObject(previousTokenFromRedis);
-					response.setResponse("User successfully logged out");
+					if (previousTokenFromRedis != null) {
+						deleteSessionObjectByGettingSessionDetails(previousTokenFromRedis);
+						sessionObject.deleteSessionObject(previousTokenFromRedis);
+						response.setResponse("User successfully logged out");
+					} else
+						throw new IEMRException("Unable to fetch session from redis");
 				}
-				else
-					throw new IEMRException("Unable to fetch session from redis");
-			 }
-			}
-			else
-			{
+			} else {
 				throw new IEMRException("Invalid request object");
 			}
-		
+
 		} catch (Exception e) {
 			logger.error("logOutUserFromConcurrentSession failed with error " + e.getMessage(), e);
 			response.setError(e);
@@ -215,29 +212,23 @@ public class IEMRAdminController {
 
 	/**
 	 * 
-	 * @param SH20094090,19-04-2022
 	 * function to return session object against userName
 	 */
-	private String getConcurrentCheckSessionObjectAgainstUser(String userName)
-	{
-		String response=null;
-		try
-		{
-			response= sessionObject
-			.getSessionObject(userName);
-		}
-		catch(Exception e)
-		{
+	private String getConcurrentCheckSessionObjectAgainstUser(String userName) {
+		String response = null;
+		try {
+			response = sessionObject.getSessionObject(userName);
+		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
 		return response;
 	}
+
 	private void createUserMapping(User mUser, JSONObject resMap, JSONObject serviceRoleMultiMap,
 			JSONObject serviceRoleMap, JSONArray serviceRoleList, JSONObject previlegeObj) {
 		String fName = mUser.getFirstName();
 		String lName = mUser.getLastName();
 		String mName = mUser.getMiddleName();
-//		mName = mName == null ? "" : mName;
 		String uName = (fName == null ? "" : fName) + " " + (mName == null ? "" : mName) + " "
 				+ (lName == null ? "" : lName);
 		resMap.put("userID", mUser.getUserID());
@@ -252,10 +243,6 @@ public class IEMRAdminController {
 		if (mUser.getDesignation() != null) {
 			resMap.put("designation", new JSONObject(mUser.getDesignation().toString()));
 		}
-		// User userData;
-		// for (Iterator localIterator1 = mUser.iterator(); localIterator1.hasNext();)
-		// {
-		// userData = (User) localIterator1.next();
 		for (UserServiceRoleMapping m_UserServiceRoleMapping : mUser.getM_UserServiceRoleMapping()) {
 			serviceRoleMultiMap.put(
 					m_UserServiceRoleMapping.getM_ProviderServiceMapping().getM_ServiceMaster().getServiceName(),
@@ -280,7 +267,6 @@ public class IEMRAdminController {
 			JSONArray roles = previlegeObj.getJSONObject(serv).getJSONArray("roles");
 			roles.put(new JSONObject(m_UserServiceRoleMapping.getM_Role().toString()));
 		}
-		// }
 		Iterator<String> keySet = serviceRoleMultiMap.keys();
 		while (keySet.hasNext()) {
 			String s = keySet.next();
@@ -302,7 +288,7 @@ public class IEMRAdminController {
 		OutputResponse response = new OutputResponse();
 		logger.info("userAuthenticate request ");
 		try {
-			
+
 			if (!m_User.getUserName().equalsIgnoreCase("SuperAdmin")) {
 				throw new IEMRException("Please log with admin credentials");
 			}
@@ -310,27 +296,17 @@ public class IEMRAdminController {
 			User mUser = iemrAdminUserServiceImpl.superUserAuthenticate(m_User.getUserName(), decryptPassword);
 			JSONObject resMap = new JSONObject();
 			JSONObject previlegeObj = new JSONObject();
-			//condition added to check for concurrent login
-			if(m_User.getUserName() !=null && (m_User.getDoLogout() ==null || m_User.getDoLogout() == false))
-			{
-				String tokenFromRedis=getConcurrentCheckSessionObjectAgainstUser(m_User.getUserName().trim().toLowerCase());
-				if (tokenFromRedis !=null)
-				{
-					//response.setError(5005, "You are already logged in,please confirm to logout from other device and login again");
-					throw new IEMRException("You are already logged in,please confirm to logout from other device and login again");
+			if (m_User.getUserName() != null && (m_User.getDoLogout() == null || m_User.getDoLogout() == false)) {
+				String tokenFromRedis = getConcurrentCheckSessionObjectAgainstUser(
+						m_User.getUserName().trim().toLowerCase());
+				if (tokenFromRedis != null) {
+					throw new IEMRException(
+							"You are already logged in,please confirm to logout from other device and login again");
 				}
-			}
-			else if(m_User.getUserName() !=null && m_User.getDoLogout() !=null && m_User.getDoLogout() == true)
-			{
+			} else if (m_User.getUserName() != null && m_User.getDoLogout() != null && m_User.getDoLogout() == true) {
 				deleteSessionObject(m_User.getUserName().trim().toLowerCase());
 			}
 			if (mUser != null) {
-//				String fName = mUser.getFirstName();
-//				String lName = mUser.getLastName();
-//				String mName = mUser.getMiddleName();
-//				mName = mName == null ? "" : mName;
-//				String uName = (fName == null ? "" : fName) + " " + (mName == null ? "" : mName) + " "
-//						+ (lName == null ? "" : lName);
 				resMap.put("userID", mUser.getUserID());
 				resMap.put("isAuthenticated", /* Boolean.valueOf(true) */true);
 				resMap.put("userName", mUser.getUserName());
@@ -361,36 +337,36 @@ public class IEMRAdminController {
 		return response.toString();
 	}
 
-	@CrossOrigin()
-	@RequestMapping(value = "/userAuthenticateV1", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
-	public String userAuthenticateV1(
-			@ApiParam(value = "\"{\\\"userName\\\":\\\"String\\\",\\\"password\\\":\\\"String\\\"}\"") @RequestBody LoginRequestModel loginRequest,
-			HttpServletRequest request) {
-		OutputResponse response = new OutputResponse();
-		logger.info("userAuthenticate request ");
-		try {
+//	@CrossOrigin()
+//	@ApiOperation(value = "User authentication V1")
+//	@RequestMapping(value = "/userAuthenticateV1", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
+//	public String userAuthenticateV1(
+//			@ApiParam(value = "\"{\\\"userName\\\":\\\"String\\\",\\\"password\\\":\\\"String\\\"}\"") @RequestBody LoginRequestModel loginRequest,
+//			HttpServletRequest request) {
+//		OutputResponse response = new OutputResponse();
+//		logger.info("userAuthenticate request ");
+//		try {
+//
+//			String remoteAddress = request.getHeader("X-FORWARDED-FOR");
+//			if (remoteAddress == null || remoteAddress.trim().length() == 0) {
+//				remoteAddress = request.getRemoteAddr();
+//			}
+//			LoginResponseModel resp = iemrAdminUserServiceImpl.userAuthenticateV1(loginRequest, remoteAddress,
+//					request.getRemoteHost());
+//			JSONObject responseObj = new JSONObject(OutputMapper.gsonWithoutExposeRestriction().toJson(resp));
+//			responseObj = iemrAdminUserServiceImpl.generateKeyAndValidateIP(responseObj, remoteAddress,
+//					request.getRemoteHost());
+//			response.setResponse(responseObj.toString());
+//		} catch (Exception e) {
+//			logger.error("userAuthenticate failed with error " + e.getMessage(), e);
+//			response.setError(e);
+//		}
+//		logger.info("userAuthenticate response " + response.toString());
+//		return response.toString();
+//	}
 
-			String remoteAddress = request.getHeader("X-FORWARDED-FOR");
-			if (remoteAddress == null || remoteAddress.trim().length() == 0) {
-				remoteAddress = request.getRemoteAddr();
-			}
-			LoginResponseModel resp = iemrAdminUserServiceImpl.userAuthenticateV1(loginRequest, remoteAddress,
-					request.getRemoteHost());
-			// logger.info("Login response is before redis " +
-			// OutputMapper.gsonWithoutExposeRestriction().toJson(resp));
-			JSONObject responseObj = new JSONObject(OutputMapper.gsonWithoutExposeRestriction().toJson(resp));
-			responseObj = iemrAdminUserServiceImpl.generateKeyAndValidateIP(responseObj, remoteAddress,
-					request.getRemoteHost());
-			response.setResponse(responseObj.toString());
-		} catch (Exception e) {
-			logger.error("userAuthenticate failed with error " + e.getMessage(), e);
-			response.setError(e);
-		}
-		logger.info("userAuthenticate response " + response.toString());
-		return response.toString();
-	}
-
 	@CrossOrigin()
+	@ApiOperation(value = "Get login response")
 	@RequestMapping(value = "/getLoginResponse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String getLoginResponse(HttpServletRequest request) {
 		OutputResponse response = new OutputResponse();
@@ -406,6 +382,7 @@ public class IEMRAdminController {
 					 * allowedHeaders = "Authorization", exposedHeaders = "Authorization", methods =
 					 * RequestMethod.POST
 					 */)
+	@ApiOperation(value = "Forget password")
 	@RequestMapping(value = "/forgetPassword", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
 	public String forgetPassword(
 			@ApiParam(value = "\"{\\\"userName\\\":\\\"String\\\"}\"") @RequestBody ChangePasswordModel m_User) {
@@ -432,8 +409,6 @@ public class IEMRAdminController {
 
 						quesAnsList.add(quesAnsMap);
 					}
-					// unnecessary code, remove in next build, return list of questionaries,
-					// quesAnsList
 					resMap.put("SecurityQuesAns", quesAnsList);
 				}
 				response.setResponse(OutputMapper.gsonWithoutExposeRestriction().toJson(resMap));
@@ -447,6 +422,7 @@ public class IEMRAdminController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Set forget password")
 	@RequestMapping(value = "/setForgetPassword", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
 	public String setPassword(
 			@ApiParam(value = "\"{\"userName\":\"String\",\"password\":\"String\",\"transactionId\":\"String\"}\"") @RequestBody ChangePasswordModel m_user) {
@@ -463,7 +439,7 @@ public class IEMRAdminController {
 			String setStatus;
 			String decryptPassword = aesUtil.decrypt("Piramal12Piramal", m_user.getPassword());
 			noOfRowModified = iemrAdminUserServiceImpl.setForgetPassword(mUser, decryptPassword,
-			m_user.getTransactionId(), m_user.getIsAdmin());
+					m_user.getTransactionId(), m_user.getIsAdmin());
 			if (noOfRowModified > 0) {
 				setStatus = "Password Changed";
 			} else {
@@ -485,6 +461,7 @@ public class IEMRAdminController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Change password")
 	@RequestMapping(value = "/changePassword", method = RequestMethod.POST, produces = "application/json")
 	public String changePassword(
 			@ApiParam(value = "\"{\\\"userName\\\":\\\"String\\\",\\\"password\\\":\\\"String\\\",\\\"transactionId\\\":\\\"String\\\"}\"") @RequestBody ChangePasswordModel changePassword) {
@@ -498,15 +475,24 @@ public class IEMRAdminController {
 				throw new IEMRException("Change password failed with error as user is not available");
 			}
 			try {
-				if (!securePassword.validatePassword(changePassword.getPassword(), mUsers.get(0).getPassword())) {
-					throw new IEMRException("Change password failed with error as old password is incorrect");
+				int validatePassword;
+				validatePassword = securePassword.validatePassword(changePassword.getPassword(),
+						mUsers.get(0).getPassword());
+				if (validatePassword == 1) {
+					User mUser = mUsers.get(0);
+					noOfRowUpdated = iemrAdminUserServiceImpl.setForgetPassword(mUser, changePassword.getNewPassword(),
+							changePassword.getTransactionId(), changePassword.getIsAdmin());
+
+				} else if (validatePassword == 2) {
+					User mUser = mUsers.get(0);
+					noOfRowUpdated = iemrAdminUserServiceImpl.setForgetPassword(mUser, changePassword.getNewPassword(),
+							changePassword.getTransactionId(), changePassword.getIsAdmin());
+
 				}
 			} catch (Exception e) {
-				throw new IEMRException("Change password failed with error as old password is incorrect");
+				throw new IEMRException(e.getMessage());
 			}
-			User mUser = mUsers.get(0);
-			noOfRowUpdated = iemrAdminUserServiceImpl.setForgetPassword(mUser, changePassword.getNewPassword(),
-					changePassword.getTransactionId(),changePassword.getIsAdmin());
+
 			if (noOfRowUpdated > 0) {
 				changeReqResult = "Password SuccessFully Change";
 			} else {
@@ -520,9 +506,9 @@ public class IEMRAdminController {
 		logger.info("changePassword response " + response.toString());
 		return response.toString();
 	}
-	
 
 	@CrossOrigin()
+	@ApiOperation(value = "Save user security questions & answers")
 	@RequestMapping(value = "/saveUserSecurityQuesAns", method = RequestMethod.POST, produces = "application/json")
 	public String saveUserSecurityQuesAns(
 			@ApiParam(value = "\"[{\\\"userID\\\":\\\"Integer\\\",\\\"questionID\\\":\\\"Integer\\\",\\\"answers\\\":\\\"String\\\","
@@ -548,6 +534,7 @@ public class IEMRAdminController {
 					 * allowedHeaders = "Authorization", exposedHeaders = "Authorization", methods =
 					 * RequestMethod.GET
 					 */)
+	@ApiOperation(value = "Get security quetions")
 	@RequestMapping(value = "/getsecurityquetions", method = RequestMethod.GET)
 	public String getSecurityts() {
 		OutputResponse response = new OutputResponse();
@@ -567,6 +554,7 @@ public class IEMRAdminController {
 					 * allowedHeaders = "Authorization", exposedHeaders = "Authorization", methods =
 					 * RequestMethod.POST
 					 */)
+	@ApiOperation(value = "Get roles by provider id")
 	@RequestMapping(value = "/getRolesByProviderID", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String getRolesByProviderID(
 			@ApiParam(value = "{\"providerServiceMapID\":\"Integer - providerServiceMapID\"}") @RequestBody String request) {
@@ -586,6 +574,7 @@ public class IEMRAdminController {
 					 * allowedHeaders = "Authorization", exposedHeaders = "Authorization", methods =
 					 * RequestMethod.POST
 					 */)
+	@ApiOperation(value = "Get role screen mapping by provider id")
 	@RequestMapping(value = "/getRoleScreenMappingByProviderID", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String getRoleScreenMappingByProviderID(
 			@ApiParam(value = "{\"providerServiceMapID\":\"Integer - providerServiceMapID\"}") @RequestBody String request) {
@@ -613,6 +602,7 @@ public class IEMRAdminController {
 					 * allowedHeaders = "Authorization", exposedHeaders = "Authorization", methods =
 					 * RequestMethod.POST
 					 */)
+	@ApiOperation(value = "Get users by provider id")
 	@RequestMapping(value = "/getUsersByProviderID", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String getUsersByProviderID(
 			@ApiParam(value = "{\"providerServiceMapID\":\"Integer - providerServiceMapID\", "
@@ -634,6 +624,7 @@ public class IEMRAdminController {
 					 * allowedHeaders = "Authorization", exposedHeaders = "Authorization", methods =
 					 * RequestMethod.POST
 					 */)
+	@ApiOperation(value = "Get user service point van details")
 	@RequestMapping(value = "/getUserServicePointVanDetails", method = RequestMethod.POST, produces = "application/json", headers = "Authorization")
 	public String getUserServicePointVanDetails(
 			@ApiParam(value = "\"{\\\"userID\\\":\\\"Integer\\\",\"providerServiceMapID\":\"Integer\"}\"") @RequestBody String comingRequest) {
@@ -645,7 +636,6 @@ public class IEMRAdminController {
 			String responseData = iemrAdminUserServiceImpl.getUserServicePointVanDetails(obj.getInt("userID"));
 			response.setResponse(responseData);
 		} catch (Exception e) {
-			// e.printStackTrace();
 			response.setError(e);
 			logger.error("get User SP and van details failed with " + e.getMessage(), e);
 
@@ -655,6 +645,7 @@ public class IEMRAdminController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Get service point villages")
 	@RequestMapping(value = "/getServicepointVillages", method = RequestMethod.POST, produces = "application/json", headers = "Authorization")
 	public String getServicepointVillages(
 			@ApiParam(value = "\"{\\\"servicePointID\\\":\\\"Integer\\\"}\"") @RequestBody String comingRequest) {
@@ -666,7 +657,6 @@ public class IEMRAdminController {
 			String responseData = iemrAdminUserServiceImpl.getServicepointVillages(obj.getInt("servicePointID"));
 			response.setResponse(responseData);
 		} catch (Exception e) {
-			// e.printStackTrace();
 			response.setError(e);
 			logger.error("get villages with servicepoint failed with " + e.getMessage(), e);
 
@@ -676,6 +666,7 @@ public class IEMRAdminController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Get locations by provider id")
 	@RequestMapping(value = "/getLocationsByProviderID", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String getLocationsByProviderID(
 			@ApiParam(value = "{\"providerServiceMapID\":\"Integer - providerServiceMapID\", "
@@ -693,6 +684,7 @@ public class IEMRAdminController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "User log out")
 	@RequestMapping(value = "/userLogout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String userLogout(HttpServletRequest request) {
 		OutputResponse response = new OutputResponse();
@@ -712,41 +704,35 @@ public class IEMRAdminController {
 	 * @param request
 	 * @return
 	 */
-	private void deleteSessionObjectByGettingSessionDetails(String key)
-	{
-		String sessionDetails=null;
+	private void deleteSessionObjectByGettingSessionDetails(String key) {
+		String sessionDetails = null;
 		try {
-			logger.info("inside delete child:"+key);
-			sessionDetails=sessionObject.getSessionObject(key);
-			logger.info("isessionDetails:"+sessionDetails);
+			logger.info("inside delete child:" + key);
+			sessionDetails = sessionObject.getSessionObject(key);
+			logger.info("isessionDetails:" + sessionDetails);
 			JsonObject jsnOBJ = new JsonObject();
 			JsonParser jsnParser = new JsonParser();
 			JsonElement jsnElmnt = jsnParser.parse(sessionDetails);
 			jsnOBJ = jsnElmnt.getAsJsonObject();
-			if(jsnOBJ.has("userName") && jsnOBJ.get("userName") !=null)
-			{
-				logger.info("deleting key:"+jsnOBJ.get("userName").getAsString().trim().toLowerCase());
+			if (jsnOBJ.has("userName") && jsnOBJ.get("userName") != null) {
+				logger.info("deleting key:" + jsnOBJ.get("userName").getAsString().trim().toLowerCase());
 				sessionObject.deleteSessionObject(jsnOBJ.get("userName").getAsString().trim().toLowerCase());
 			}
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
 	}
-	private void deleteSessionObject(String key)
-	{
-		try
-		{
+
+	private void deleteSessionObject(String key) {
+		try {
 			sessionObject.deleteSessionObject(key);
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
 	}
-	
+
 	@CrossOrigin()
+	@ApiOperation(value = "Force log out")
 	@RequestMapping(value = "/forceLogout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String forceLogout(@ApiParam(value = "{\"userName\":\"String user name to force logout\", "
 			+ "\"providerServiceMapID\":\"Integer service provider ID\"}") @RequestBody ForceLogoutRequestModel request) {
@@ -761,6 +747,7 @@ public class IEMRAdminController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "User force log out")
 	@RequestMapping(value = "/userForceLogout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String userForceLogout(
 			@ApiParam(value = "\"{\\\"userName\\\":\\\"String\\\"}\"") @RequestBody ForceLogoutRequestModel request) {
@@ -775,6 +762,7 @@ public class IEMRAdminController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Get agent by role id")
 	@RequestMapping(value = "/getAgentByRoleID", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String getAgentByRoleID(@ApiParam(value = "{\"providerServiceMapID\":\"Integer - providerServiceMapID\", "
 			+ "\"RoleID\":\"Optional: Integer - role ID to be filtered\"}") @RequestBody String request) {
@@ -791,6 +779,7 @@ public class IEMRAdminController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "User authenticate by encryption")
 	@RequestMapping(value = "/userAuthenticateByEncryption", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON)
 	public String userAuthenticateByEncryption(
 			@ApiParam(value = "\"{\\\"userName\\\":\\\"String\\\",\\\"password\\\":\\\"String\\\"}\"") @RequestBody String req,
@@ -835,6 +824,7 @@ public class IEMRAdminController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Get role wrap up time")
 	@RequestMapping(value = "/role/{roleID}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String getrolewrapuptime(@PathVariable("roleID") Integer roleID) {
 
@@ -848,13 +838,10 @@ public class IEMRAdminController {
 		} catch (Exception e) {
 			response.setError(e);
 		}
-//		logger.info("response is " + response.toStringWithSerialization());
 		return response.toString();
-//		return test.toString();
 	}
 
 	/**
-	 * @author DE40034072 Date 23-03-2022
 	 * @param request
 	 * @return transaction Id for password change
 	 */
@@ -883,5 +870,7 @@ public class IEMRAdminController {
 		logger.info("validateSecurityQuestionAndAnswer API response" + response.toString());
 		return response.toString();
 	}
+
+	
 
 }

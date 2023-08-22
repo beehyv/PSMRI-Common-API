@@ -48,7 +48,7 @@ public class DoorToDoorAppController {
 	private DoorToDoorService doorToDoorService;
 
 	@CrossOrigin
-	@ApiOperation(value = "getUserDetails", consumes = "application/json", produces = "application/json")
+	@ApiOperation(value = "Get user details", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = { "/getUserDetails" }, method = { RequestMethod.POST })
 	public String getUserDetails(@RequestBody String requestObj) {
 		OutputResponse response = new OutputResponse();
@@ -61,7 +61,6 @@ public class DoorToDoorAppController {
 			else
 				response.setError(5000, "user details not found");
 		} catch (Exception e) {
-			// TODO: handle exception
 			logger.error(e.toString());
 			response.setError(5000, "Unable to get user data, exception occured. " + e.toString());
 		}
@@ -70,7 +69,7 @@ public class DoorToDoorAppController {
 	}
 
 	@CrossOrigin
-	@ApiOperation(value = "get NCD TB HRP suspected status", consumes = "application/json", produces = "application/json")
+	@ApiOperation(value = "Get NCD TB HRP suspected status", consumes = "application/json", produces = "application/json")
 	@RequestMapping(value = { "/getSuspectedData_HRP_TB_NCD" }, method = { RequestMethod.POST })
 	public String getSuspectedData_HRP_TB_NCD(@RequestBody String requestObj) {
 		OutputResponse response = new OutputResponse();
@@ -83,7 +82,6 @@ public class DoorToDoorAppController {
 			else
 				response.setError(5000, "Error in getting suspected information");
 		} catch (Exception e) {
-			// TODO: handle exception
 			logger.error(e.toString());
 			response.setError(5000, "Error in getting suspected information, exception occured. " + e.toString());
 		}

@@ -26,10 +26,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.iemr.common.utils.IEMRApplBeans;
 
 @SpringBootApplication
+@EnableScheduling
 public class CommonApplication extends SpringBootServletInitializer {
 
 	@Bean

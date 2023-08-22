@@ -21,6 +21,7 @@
 */
 package com.iemr.common.data.nhm_dashboard;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -58,7 +59,7 @@ public class AbandonCallSummary {
 	private Integer queueTime;
 	@Expose
 	@Column(name = "DIDNumber")
-	private Integer didNumber;
+	private BigInteger didNumber;
 	@Expose
 	@Column(name = "Skills")
 	private String skills;

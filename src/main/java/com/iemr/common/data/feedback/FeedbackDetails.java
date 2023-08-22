@@ -97,7 +97,6 @@ public class FeedbackDetails {
 	private String instiName;
 
 	@Transient
-	@Expose
 	private String instituteName = "";
 
 	@Column(name = "DesignationID")

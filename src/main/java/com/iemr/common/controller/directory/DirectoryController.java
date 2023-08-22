@@ -79,16 +79,14 @@ public class DirectoryController
 	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 	@CrossOrigin()
+	@ApiOperation(value = "Get directory")
 	@RequestMapping(value = "/getDirectory", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON,
 			headers = "Authorization")
 	public String getDirectory()
 	{
 		OutputResponse response = new OutputResponse();
-		// logger.info("getDirectory request " + directoryRequest);
 		try
 		{
-			// Directory directory =
-			// inputMapper.gson().fromJson(directoryRequest, Directory.class);
 			JSONObject responseObj = new JSONObject();
 			responseObj.put("directory", directoryService.getDirectories());
 			response.setResponse(responseObj.toString());
@@ -102,6 +100,7 @@ public class DirectoryController
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Get directory V1")
 	@RequestMapping(value = "/getDirectoryV1", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON,
 			headers = "Authorization")
 	public String getDirectoryV1(
@@ -113,8 +112,6 @@ public class DirectoryController
 		{
 			Directory directory = inputMapper.gson().fromJson(directoryRequest, Directory.class);
 			JSONObject responseObj = new JSONObject();
-			// responseObj.put("directory",
-			// directoryService.getDirectories(directory.getProviderServiceMapID()));
 			response.setResponse("{\"directory\":"
 					+ directoryService.getDirectories(directory.getProviderServiceMapID()).toString() + "}");
 		} catch (Exception e)
@@ -138,8 +135,6 @@ public class DirectoryController
 		{
 			JSONObject responseObj = new JSONObject();
 			SubDirectory subDirectoryQuery = inputMapper.gson().fromJson(subDirectoryRequest, SubDirectory.class);
-			// responseObj.put("subDirectory",
-			// subDirectoryService.getSubDirectories(subDirectoryQuery.getInstituteDirectoryID()).toString());
 			response.setResponse("{subDirectory:"
 					+ subDirectoryService.getSubDirectories(subDirectoryQuery.getInstituteDirectoryID()) + "}");
 		} catch (Exception e)

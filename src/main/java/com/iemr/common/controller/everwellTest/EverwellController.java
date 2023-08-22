@@ -36,6 +36,8 @@ import com.iemr.common.model.user.LoginRequestModelEverwell;
 import com.iemr.common.utils.mapper.InputMapper;
 import com.iemr.common.utils.response.OutputResponse;
 
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping(value = "/everwell")
 public class EverwellController {
@@ -43,16 +45,11 @@ public class EverwellController {
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 	@CrossOrigin()
+	@ApiOperation(value = "Get data")
 	@RequestMapping(value = "/getjson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String getdata() {
 		OutputResponse response = new OutputResponse();
 		try {
-			// BenCallServicesMappingHistory service1097HistoryDetails =
-			// inputMapper.gson().fromJson(beneficiaryRequest,
-			// BenCallServicesMappingHistory.class);
-			// List<BenCallServicesMappingHistory> serviceHistoryList =
-			// servicesHistoryService
-			// .getServiceHistory(service1097HistoryDetails.getBeneficiaryRegID());
 			String str = null;
 			str = "{   \"Success\": true,\"TotalRecords\": 3,\"currentPage\": 1,\"Data\": [{ \r\n"
 					+ "					        \"Id\": 1232, \r\n"
@@ -67,560 +64,6 @@ public class EverwellController {
 					+ "					        \"AdherencePercentage\": 50 \r\n" + "					      }]\r\n"
 					+ "						  }";
 
-//			if(Authorization.equals("Bearer XwvQ8FWJgL1r1coDA9hI9Zfn0BnzSe0MsI5ECb6UhhSFz96ASoh")) {
-//					   str = "{   \"Success\": true,\"TotalRecords\": 3,\"currentPage\": 1,\"Data\": [{ \r\n" + 
-//					   		"					        \"Id\": 1232, \r\n" + 
-//					   		"							\"FirstName\": \"Test\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Female\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1233, \r\n" + 
-//					   		"							\"FirstName\": \"TestA\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1234, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1235, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1236, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1237, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1238, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1239, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1240, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1241, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1242, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1243, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1244, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1245, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1246, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1247, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1248, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1249, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1250, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1251, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1252, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1253, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1254, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1255, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1256, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1257, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1258, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1259, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1260, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1261, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1262, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1263, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1264, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1265, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1266, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1267, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1268, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1269, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1270, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1271, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1272, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1273, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1274, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1275, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1276, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1277, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1278, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1279, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1280, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      },{ \r\n" + 
-//					   		"					        \"Id\": 1281, \r\n" + 
-//					   		"							\"FirstName\": \"TestB\", \r\n" + 
-//					   		"					        \"LastName\": \"tester\", \r\n" + 
-//					   		"							\"Gender\":\"Male\",\r\n" + 
-//					   		"					        \"PrimaryNumber\": \"1111111111\", \r\n" + 
-//					   		"					        \"MissedDoses\":2, \r\n" + 
-//					   		"					        \"FacilityName\": \"Facility X\", \r\n" + 
-//					   		"					        \"State\": \"Uttar Pradesh\", \r\n" + 
-//					   		"							\"District\": \"Varanasi\", \r\n" + 
-//					   		"					        \"AdherencePercentage\": 50 \r\n" + 
-//					   		"					      }] }";
-//			}
-
 			String str1 = "\"Success\":true";
 			response.setResponse(str);
 		} catch (Exception e) {
@@ -631,17 +74,12 @@ public class EverwellController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Add support action")
 	@RequestMapping(value = {
 			"/addSupportAction/{id}" }, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String addSupportAction(@PathVariable("id") Long id, @RequestBody String request) {
 		OutputResponse response = new OutputResponse();
 		try {
-			// BenCallServicesMappingHistory service1097HistoryDetails =
-			// inputMapper.gson().fromJson(beneficiaryRequest,
-			// BenCallServicesMappingHistory.class);
-			// List<BenCallServicesMappingHistory> serviceHistoryList =
-			// servicesHistoryService
-			// .getServiceHistory(service1097HistoryDetails.getBeneficiaryRegID());
 
 			String str = "{   \"Id\": 123456789," + "\"UserId\": 123," + "\"UserDescription\": \"Demo Login\",\r\n"
 					+ "\"ActionTaken\": \"Call\",\r\n" + " \"Comments\": \"Well, This is a Sample Comment\",\r\n"
@@ -657,17 +95,12 @@ public class EverwellController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Edit manual doses")
 	@RequestMapping(value = {
 			"/editManualDoses/{id}" }, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String editManualDoses(@PathVariable("id") Long id, @RequestBody String request) {
 		OutputResponse response = new OutputResponse();
 		try {
-			// BenCallServicesMappingHistory service1097HistoryDetails =
-			// inputMapper.gson().fromJson(beneficiaryRequest,
-			// BenCallServicesMappingHistory.class);
-			// List<BenCallServicesMappingHistory> serviceHistoryList =
-			// servicesHistoryService
-			// .getServiceHistory(service1097HistoryDetails.getBeneficiaryRegID());
 
 			String str = "{     \"PatientId\": 123456789,     \"Note\": {         \"Id\": 0,         \"UserId\": 123,         \"UserDescription\": \"Demo Login\",         \"ActionTaken\": \"Manual doses marked for 2/3/2020, 3/3/2020, 7/3/2020\",         \"Comments\": null,         \"Category\": null,         \"SubCategory\": null,         \"Timestamp\": \"2020-03-20T04:13:17.6245221\",         \"DateOfAction\": null     },     \"AdherenceString\": \"8999999999966666666666666666666\" } \r\n";
 			response.setResponse(str);
@@ -679,15 +112,14 @@ public class EverwellController {
 	}
 
 	@CrossOrigin()
+	@ApiOperation(value = "Everwell login")
 	@RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON, headers = "Authorization")
 	public String everwellLogin(@RequestBody LoginRequestModelEverwell login) {
 
 		OutputResponse response = new OutputResponse();
 		logger.info("It reaches here ");
-//		System.out.println("It reaches here");
 		try {
 			String responseData = null;
-//			String remoteAddress = request.getHeader("X-FORWARDED-FOR");
 			if (login.getEverwellUserName().equalsIgnoreCase("everwellUser")
 					&& login.getEverwellPassword().equals("everwellpass")) {
 
